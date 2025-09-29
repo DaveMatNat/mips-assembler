@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.asm": "shellscript",
+        "vector": "cpp",
+        "string": "cpp"
+    }
+}
