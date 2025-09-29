@@ -1,2 +1,6 @@
 *.o
 *.bin
+*.docx
+*.pdf
+assemble
+readbytes
