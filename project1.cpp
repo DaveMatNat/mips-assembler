@@ -9,6 +9,9 @@
 #include <sstream>
 #include <fstream>
 
+// Added Map
+#include <map>
+
 int main(int argc, char *argv[])
 {
     if (argc < 4) // Checks that at least 3 arguments are given in command line
@@ -32,6 +35,9 @@ int main(int argc, char *argv[])
      * (measured in instructions) starting at 0
      */
 
+    int curr_line_num = 0; // Line number
+    map<string,int> labels_line_num; // Label and what line number they correspond to ()
+
     // For each input file:
     for (int i = 1; i < argc - 2; i++)
     {
@@ -49,8 +55,16 @@ int main(int argc, char *argv[])
             if (str == "")
             { // Ignore empty lines
                 continue;
+            } else if (str.rfind(":") == str.length() - 1) { // If label --> Map to line number of next instruction
+                str = str.substr(0, str.length() - 1);
+                // count << str << endl;
+                labels_line_num[str] = curr_line_num;
+                continue;
+            } else {
+                instructions.push_back(str); // TODO This will need to change for labels
             }
-            instructions.push_back(str); // TODO This will need to change for labels
+
+            curr_line_num++;
         }
         infile.close();
     }
@@ -59,6 +73,7 @@ int main(int argc, char *argv[])
      * Process all static memory, output to static memory file
      * TODO: All of this
      */
+
 
     /** Phase 3
      * Process all instructions, output to instruction memory file
@@ -69,7 +84,7 @@ int main(int argc, char *argv[])
         vector<string> terms = split(inst, WHITESPACE + ",()");
         string inst_type = terms[0];
         // for debugging
-        cout << inst_type << endl;
+        // cout << inst_type << endl;
         if (inst_type == "add")
         {
             int result = encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 32);
@@ -142,16 +157,20 @@ int main(int argc, char *argv[])
         }
         else if (inst_type == "j")
         {
-            // registers[terms[1]] == Label
+            // terms[1] == Label
+            // labels_line_num[terms[1]] == Line Number of intruction after the Label
+            int line_number = labels_line_num[terms[1]];
             
-            int result = encode_Jtype(2, registers[terms[1]]);
+            int result = encode_Jtype(2, line_number);
             write_binary(result, inst_outfile);
         }
         else if (inst_type == "jal")
         {
+
         }
         else if (inst_type == "jr")
         {
+            
         }
         else if (inst_type == "jalr")
         {
@@ -165,6 +184,17 @@ int main(int argc, char *argv[])
         else
         {
         }
+    }
+
+    // Print map of labels and line nums
+    for (int i = 0; i < instructions.size() - 1; i++) {
+        cout << i << ": " << instructions[i] << endl;
+    }
+
+    cout << "\n\tLABELS\n" << endl;
+    // Print map of labels and line nums
+    for (auto l : labels_line_num) {
+        cout << l.first << " --> " << l.second << endl;
     }
 }
 

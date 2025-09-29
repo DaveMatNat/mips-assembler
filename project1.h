@@ -73,10 +73,12 @@ int encode_Rtype(int opcode, int rs, int rt, int rd, int shftamt, int funccode) 
 
 // I-format
 int encode_Itype(int opcode, int rs, int rt, int addr_const) {
-    // Mask the immediate to 16 bits to ensures proper two's complement representation for negative immediates
-    int immediate = addr_const & 0xFFFF;
+    // If num is negative, remove 16bits of preceding 1's
+    if (addr_const < 0) {
+        addr_const = addr_const & 0b00000000000000001111111111111111;
+    }
     // cout << ((opcode << 26) + (rs << 21) + (rt << 16) + immediate) << endl;
-    return (opcode << 26) + (rs << 21) + (rt << 16) + immediate;
+    return (opcode << 26) + (rs << 21) + (rt << 16) + addr_const;
 }
 
 // J-format

@@ -2,6 +2,8 @@
     "files.associations": {
         "*.asm": "shellscript",
         "vector": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "iostream": "cpp"
     }
 }
