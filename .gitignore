@@ -1,5 +1,6 @@
 *.o
 *.bin
+!Testcases/GoldBinaries/*.bin
 *.docx
 *.pdf
 assemble
