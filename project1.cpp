@@ -11,6 +11,7 @@
 
 // Added Map
 #include <map>
+int ra; // Global return address (line number)
 
 int main(int argc, char *argv[])
 {
@@ -38,6 +39,9 @@ int main(int argc, char *argv[])
     int curr_line_num = 0; // Line number
     map<string,int> labels_line_num; // Label and what line number they correspond to ()
 
+    map<int, string> static_memory_label_num;
+    int memory_address = 0;
+
     // For each input file:
     for (int i = 1; i < argc - 2; i++)
     {
@@ -55,12 +59,32 @@ int main(int argc, char *argv[])
             if (str == "")
             { // Ignore empty lines
                 continue;
-            } else if (str.rfind(":") == str.length() - 1) { // If label --> Map to line number of next instruction
+            } 
+            else if (str.find(".word") != string::npos){
+                vector<string> noSpace = split(str.substr(str.find(".word") + 5), WHITESPACE + ",()");
+                // for (string terms : noSpace){
+                //     cout << terms << " ";
+                // }
+                // cout << endl;
+                for (string c : noSpace){
+                    if (c == " "){
+                        continue;
+                    }
+                    static_memory_label_num[memory_address] = c;
+                    memory_address += 4;
+                }
+            }
+            
+            else if (str.rfind(":") == str.length() - 1) { // If label --> Map to line number of next instruction
                 str = str.substr(0, str.length() - 1);
                 // count << str << endl;
                 labels_line_num[str] = curr_line_num;
                 continue;
-            } else {
+            }  
+            else if (str.find(".") != string::npos) {
+                continue; // Deal with Data
+            }
+            else {
                 instructions.push_back(str); // TODO This will need to change for labels
             }
 
@@ -73,12 +97,14 @@ int main(int argc, char *argv[])
      * Process all static memory, output to static memory file
      * TODO: All of this
      */
+     
 
 
     /** Phase 3
      * Process all instructions, output to instruction memory file
      * TODO: Almost all of this, it only works for adds
      */
+    curr_line_num = 0;
     for (string inst : instructions)
     {
         vector<string> terms = split(inst, WHITESPACE + ",()");
@@ -131,13 +157,17 @@ int main(int argc, char *argv[])
             write_binary(result, inst_outfile);
         }
         else if (inst_type == "lw")
-        {
-            int result = encode_Itype(35, 0, registers[terms[1]], registers[terms[2]]);
+        {   
+            // cout << terms[3] << endl;
+            int offset = stoi(terms[2]);
+            int result = encode_Itype(35, registers[terms[3]],registers[terms[1]], offset);
             write_binary(result, inst_outfile); 
         }
         else if (inst_type == "sw")
-        {
-            int result = encode_Itype(43, 0, registers[terms[1]], registers[terms[2]]);
+        {   
+            
+            int offset = stoi(terms[2]);
+            int result = encode_Itype(43, registers[terms[3]],registers[terms[1]], offset);
             write_binary(result, inst_outfile); 
         }
         else if (inst_type == "slt")
@@ -147,12 +177,16 @@ int main(int argc, char *argv[])
         }
         else if (inst_type == "beq")
         {
-            int result = encode_Itype(4, registers[terms[1]], registers[terms[2]], registers[terms[3]]);
+            int offset = labels_line_num[terms[3]] - (curr_line_num + 1);
+            // cout << offset << ": " << instructions[curr_line_num + offset] << endl;
+            int result = encode_Itype(4, registers[terms[1]], registers[terms[2]], offset);
             write_binary(result, inst_outfile);
         }
         else if (inst_type == "bne")
         {
-            int result = encode_Itype(5, registers[terms[1]], registers[terms[2]], registers[terms[3]]);
+            int offset = labels_line_num[terms[3]] - (curr_line_num + 1);
+            // cout << offset << ": " << instructions[curr_line_num + offset] << endl;
+            int result = encode_Itype(5, registers[terms[1]], registers[terms[2]], offset);
             write_binary(result, inst_outfile);
         }
         else if (inst_type == "j")
@@ -160,41 +194,59 @@ int main(int argc, char *argv[])
             // terms[1] == Label
             // labels_line_num[terms[1]] == Line Number of intruction after the Label
             int line_number = labels_line_num[terms[1]];
-            
             int result = encode_Jtype(2, line_number);
             write_binary(result, inst_outfile);
         }
         else if (inst_type == "jal")
         {
-
+            // TODO: DEAL WITH $ra (no need I think cuz in pdf says so)
+            int line_number = labels_line_num[terms[1]];
+            int result = encode_Jtype(3, line_number);
+            // ra = curr_line_num + 1; // Set return address to line after jal
+            write_binary(result, inst_outfile);
         }
         else if (inst_type == "jr")
         {
-            
+            // Placeholder
+            int result = encode_Rtype(0, registers[terms[1]], 0, 0, 0, 8);
+            write_binary(result, inst_outfile);
         }
         else if (inst_type == "jalr")
         {
+            int result = encode_Rtype(0, registers[terms[1]], 0, registers[terms[2]], 0, 9);
+            write_binary(result, inst_outfile);
         }
         else if (inst_type == "syscall")
         {
             // 000000 00000 00000 11010 00000 001100
             int result = encode_Rtype(0, 0, 0, 26, 0, 12);
             write_binary(result, inst_outfile);
+        } 
+        else if (inst_type == "la")
+        {
+            int result = encode_Itype(8, 0, registers[terms[1]], stoi(terms[2]));
+            write_binary(result, inst_outfile);
         }
         else
         {
+            
         }
+        curr_line_num++;
     }
 
-    // Print map of labels and line nums
-    for (int i = 0; i < instructions.size() - 1; i++) {
-        cout << i << ": " << instructions[i] << endl;
-    }
+    // // Print map of labels and line nums
+    // for (int i = 0; i < instructions.size() - 1; i++) {
+    //     cout << i << ": " << instructions[i] << endl;
+    // }
 
-    cout << "\n\tLABELS\n" << endl;
-    // Print map of labels and line nums
-    for (auto l : labels_line_num) {
-        cout << l.first << " --> " << l.second << endl;
+    // cout << "\n\tLABELS\n" << endl;
+    // // Print map of labels and line nums
+    // for (auto l : labels_line_num) {
+    //     cout << l.first << " --> " << l.second << endl;
+    // }
+
+    for (auto t: static_memory_label_num){
+        cout << t.first << " --< " << t.second << endl;
     }
 }
 
