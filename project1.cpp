@@ -126,149 +126,161 @@ int main(int argc, char *argv[])
 
     /** Phase 3
      * Process all instructions, output to instruction memory file
-     * TODO: Almost all of this, it only works for adds
+     * Using switch statement for cleaner code organization
      */
     curr_line_num = 0;
     for (string inst : instructions)
     {
         vector<string> terms = split(inst, WHITESPACE + ",()");
         string inst_type = terms[0];
-        // for debugging
-        // cout << inst_type << endl;
-        if (inst_type == "add")
-        {
-            int result = encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 32);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "addi")
-        {
-            int result = encode_Itype(8, registers[terms[2]], registers[terms[1]], stoi(terms[3]));
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "sub")
-        {
-            int result = encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 34);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "mult")
-        {
-            int result = encode_Rtype(0, registers[terms[1]], registers[terms[2]], 0, 0, 24);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "div")
-        {
-            int result = encode_Rtype(0, registers[terms[1]], registers[terms[2]], 0, 0, 26);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "mflo")
-        {
-            int result = encode_Rtype(0, 0, 0, registers[terms[1]], 0, 18);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "mfhi")
-        {
-            int result = encode_Rtype(0, 0, 0, registers[terms[1]], 0, 16);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "sll") // sll rd, rt, shamt
-        {
-            int result = encode_Rtype(0, 0, registers[terms[2]], registers[terms[1]], stoi(terms[3]), 0);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "srl")
-        {
-            int result = encode_Rtype(0, 0, registers[terms[2]], registers[terms[1]], stoi(terms[3]), 2);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "lw")
-        {
-            // cout << terms[3] << endl;
-            int offset = stoi(terms[2]);
-            int result = encode_Itype(35, registers[terms[3]], registers[terms[1]], offset);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "sw")
-        {
 
-            int offset = stoi(terms[2]);
-            int result = encode_Itype(43, registers[terms[3]], registers[terms[1]], offset);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "slt")
-        {
-            int result = encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "beq")
-        {
-            int offset = instruction_labels_lines[terms[3]] - (curr_line_num + 1);
-            // cout << offset << ": " << instructions[curr_line_num + offset] << endl;
-            int result = encode_Itype(4, registers[terms[1]], registers[terms[2]], offset);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "bne")
-        {
-            int offset = instruction_labels_lines[terms[3]] - (curr_line_num + 1);
-            // cout << offset << ": " << instructions[curr_line_num + offset] << endl;
-            int result = encode_Itype(5, registers[terms[1]], registers[terms[2]], offset);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "j")
-        {
-            // terms[1] == Label
-            // instruction_labels_lines[terms[1]] == Line Number of intruction after the Label
-            int line_number = instruction_labels_lines[terms[1]];
-            int result = encode_Jtype(2, line_number);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "jal")
-        {
-            // TODO: DEAL WITH $ra (no need I think cuz in pdf says so)
-            int line_number = instruction_labels_lines[terms[1]];
-            int result = encode_Jtype(3, line_number);
-            // ra = curr_line_num + 1; // Set return address to line after jal
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "jr")
-        {
-            // Placeholder
-            int result = encode_Rtype(0, registers[terms[1]], 0, 0, 0, 8);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "jalr")
-        {
-            int result;
-            // jalr with 1 register
-            if (terms.size() == 2)
-            {
-                result = encode_Rtype(0, registers[terms[1]], 0, registers["$ra"], 0, 9);
-            }
-            else
-            {
-                // jalr with 2 registers
-                result = encode_Rtype(0, registers[terms[1]], 0, registers[terms[2]], 0, 9);
-            }
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "syscall")
-        {
-            // 000000 00000 00000 11010 00000 001100
-            int result = encode_Rtype(0, 0, 0, 26, 0, 12);
-            write_binary(result, inst_outfile);
-        }
-        else if (inst_type == "la")
-        {
-            // Problematic
-            // cout << terms[2] << endl;
-            // cout << static_label_lines[terms[2]] << endl;
+        // Get instruction type enum
+        InstructionType type = (instruction_map.find(inst_type) != instruction_map.end())
+                                   ? instruction_map[inst_type]
+                                   : UNKNOWN;
 
-            int result = encode_Itype(8, 0, registers[terms[1]], static_label_lines[terms[2]]);
-            // int result = 0;
-            write_binary(result, inst_outfile);
-        }
-        else
+        int result = 0;
+
+        switch (type)
         {
+        case ADD:
+            result = add(terms);
+            break;
+
+        case ADDI:
+            result = addi(terms);
+            break;
+
+        case SUB:
+            result = sub(terms);
+            break;
+
+        case MULT:
+            result = mult(terms);
+            break;
+
+        case DIV:
+            result = div(terms);
+            break;
+
+        case MFLO:
+            result = mflo(terms);
+            break;
+
+        case MFHI:
+            result = mfhi(terms);
+            break;
+
+        case SLL:
+            result = sll(terms);
+            break;
+
+        case SRL:
+            result = srl(terms);
+            break;
+
+        case LW:
+            result = lw(terms);
+            break;
+
+        case SW:
+            result = sw(terms);
+            break;
+
+        case SLT:
+            result = slt(terms);
+            break;
+
+        case BEQ:
+            result = beq(terms, curr_line_num, instruction_labels_lines);
+            break;
+
+        case BNE:
+            result = bne(terms, curr_line_num, instruction_labels_lines);
+            break;
+
+        case J:
+            result = j(terms, instruction_labels_lines);
+            break;
+
+        case JAL:
+            result = jal(terms, instruction_labels_lines);
+            break;
+
+        case JR:
+            result = jr(terms);
+            break;
+
+        case JALR:
+            result = jalr(terms);
+            break;
+
+        case SYSCALL:
+            result = syscall(terms);
+            break;
+
+        case LA:
+            result = la(terms, static_label_lines);
+            break;
+
+        case MOV:
+            result = mov(terms);
+            break;
+
+        case LI:
+            result = li(terms);
+            break;
+
+        case SGE:
+            result = sge(terms);
+            break;
+
+        case SGT:
+            result = sgt(terms);
+            break;
+
+        case SLE:
+            result = sle(terms);
+            break;
+
+        case SEQ:
+            result = seq(terms);
+            break;
+
+        case SNE:
+            result = sne(terms);
+            break;
+
+        case BGE:
+            result = bge(terms);
+            break;
+
+        case BGT:
+            result = bgt(terms);
+            break;
+
+        case BLE:
+            result = ble(terms);
+            break;
+
+        case BLT:
+            result = blt(terms);
+            break;
+
+        case ABS:
+            result = abs(terms);
+            break;
+        
+            
+
+        case UNKNOWN:
+        default:
+            cerr << "Warning: Unknown instruction \"" << inst_type << "\" at line " << curr_line_num << "(0-based line counting)"<< endl;
+            break;
         }
+
+        write_binary(result, inst_outfile);
+
         curr_line_num++;
     }
 
