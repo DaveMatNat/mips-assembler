@@ -225,71 +225,85 @@ int mov(const vector<string> &terms)
 // TODO
 int sge(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int sgt(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int sle(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int seq(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int sne(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int bge(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int bgt(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int ble(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int blt(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int abs(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int mips_and(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int mips_or(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int mips_nor(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int mips_xor(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
@@ -340,21 +354,25 @@ int li(const vector<string> &terms)
 // TODO
 int andi(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int ori(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int xori(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int lui(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 

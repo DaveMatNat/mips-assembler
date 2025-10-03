@@ -1,6 +1,9 @@
 #ifndef __PROJECT1_CPP__
 #define __PROJECT1_CPP__
 
+// Switch to "true" for debugging
+#define DEBUG false
+
 #include "project1.h"
 #include <vector>
 #include <string>
@@ -270,12 +273,42 @@ int main(int argc, char *argv[])
         case ABS:
             result = abs(terms);
             break;
-        
-            
+
+        case AND:
+            result = mips_and(terms);
+            break;
+
+        case OR:
+            result = mips_or(terms);
+            break;
+
+        case NOR:
+            result = mips_nor(terms);
+            break;
+
+        case XOR:
+            result = mips_xor(terms);
+            break;
+
+        case ANDI:
+            result = andi(terms);
+            break;
+
+        case ORI:
+            result = ori(terms);
+            break;
+
+        case XORI:
+            result = xori(terms);
+            break;
+
+        case LUI:
+            result = lui(terms);
+            break;
 
         case UNKNOWN:
         default:
-            cerr << "Warning: Unknown instruction \"" << inst_type << "\" at line " << curr_line_num << "(0-based line counting)"<< endl;
+            cerr << "Warning: Unknown instruction \"" << inst_type << "\" at line " << curr_line_num << "(0-based line counting)" << endl;
             break;
         }
 
@@ -284,34 +317,37 @@ int main(int argc, char *argv[])
         curr_line_num++;
     }
 
-    // Print map of labels and line nums
-    cout << "\n\tLine Nums and Instruction LABELS MAP\n"
-         << endl;
-    for (int i = 0; i < instructions.size(); i++)
+    if (DEBUG)
     {
-        cout << i << ": " << instructions[i] << endl;
-    }
+        // Print map of labels and line nums
+        cout << "\n\tLine Nums and Instruction LABELS MAP\n"
+             << endl;
+        for (int i = 0; i < instructions.size(); i++)
+        {
+            cout << i << ": " << instructions[i] << endl;
+        }
 
-    cout << "\n\tLABELS\n"
-         << endl;
-    // Print map of labels and line nums
-    for (auto l : instruction_labels_lines)
-    {
-        cout << l.first << " --> " << l.second << endl;
-    }
+        cout << "\n\tLABELS\n"
+             << endl;
+        // Print map of labels and line nums
+        for (auto l : instruction_labels_lines)
+        {
+            cout << l.first << " --> " << l.second << endl;
+        }
 
-    cout << "\n\tSTATIC MEMORY\n"
-         << endl;
-    for (auto t : static_label_lines)
-    {
-        cout << t.first << " --> " << t.second << endl;
-    }
+        cout << "\n\tSTATIC MEMORY\n"
+             << endl;
+        for (auto t : static_label_lines)
+        {
+            cout << t.first << " --> " << t.second << endl;
+        }
 
-    cout << "\n\tSTATIC MEMORY Values\n"
-         << endl;
-    for (int i = 0; i < static_memory.size(); i++)
-    {
-        cout << static_memory[i] << endl;
+        cout << "\n\tSTATIC MEMORY Values\n"
+             << endl;
+        for (int i = 0; i < static_memory.size(); i++)
+        {
+            cout << static_memory[i] << endl;
+        }
     }
 }
 
