@@ -11,10 +11,12 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <regex>
 
-// Added Map
-#include <map>
-int ra; // Global return address (line number)
+// int ra; // Global return address (line number)
+
+// Regex for extracting quoted strings
+regex string_pattern("\"([^\"]*)\"");
 
 int main(int argc, char *argv[])
 {
@@ -62,16 +64,46 @@ int main(int argc, char *argv[])
             if (str == "")
             { // Ignore empty lines
                 continue;
-            } // Static Memory
+            }
+            // ASCII case
+            else if (str.find(".asciiz") != string::npos)
+            {
+                smatch match;
+                // If pattern is found
+                if (regex_search(str, match, string_pattern))
+                {
+                    // If full match and capture group exist.
+                    if (match.size() > 1)
+                    {
+                        string ascii_string = match[1].str(); // match[0] for capture group
+                        vector<string> no_space = split(str, WHITESPACE);
+
+                        string label = no_space[0];
+                        label = label.substr(0, label.length() - 1); // clean up the colon in the end
+                        static_label_lines[label] = memory_address;
+
+                        // Store each character + null terminator
+                        for (char c : ascii_string)
+                        {
+                            // convert the character to Ascii
+                            static_memory.push_back(to_string((int)c));
+                        }
+                        static_memory.push_back("0"); // null terminator
+
+                        int length = ascii_string.length() + 1; // +1 for null terminator
+                        memory_address += (4 * length);
+                    }
+                }
+                continue;
+            }
+            // Static Memory
             else if (str.find(".word") != string::npos)
             {
                 vector<string> no_space = split(str, WHITESPACE + ",()");
-                // vector<int> values = {};
                 for (int i = 2; i < no_space.size(); i++)
                 {
                     static_memory.push_back(no_space[i]);
                 }
-                // cout << "|| len --> " << no_space.size() << endl << endl;
 
                 string label = no_space[0];
                 label = label.substr(0, label.length() - 1); // clean up the colon in the end
@@ -320,7 +352,7 @@ int main(int argc, char *argv[])
     if (DEBUG)
     {
         // Print map of labels and line nums
-        cout << "\n\tLine Nums and Instruction LABELS MAP\n"
+        cout << "\n\tLine Nums and Instruction labels MAP\n"
              << endl;
         for (int i = 0; i < instructions.size(); i++)
         {
@@ -335,18 +367,18 @@ int main(int argc, char *argv[])
             cout << l.first << " --> " << l.second << endl;
         }
 
-        cout << "\n\tSTATIC MEMORY\n"
+        cout << "\n\tSTATIC MEMORY LABELS\n"
              << endl;
         for (auto t : static_label_lines)
         {
-            cout << t.first << " --> " << t.second << endl;
+            cout << t.second << " --> " << t.first << endl;
         }
 
-        cout << "\n\tSTATIC MEMORY Values\n"
+        cout << "\n\tSTATIC MEMORY VALUES\n"
              << endl;
         for (int i = 0; i < static_memory.size(); i++)
         {
-            cout << static_memory[i] << endl;
+            cout << "address " << i * 4 << " --> " << static_memory[i] << endl;
         }
     }
 }

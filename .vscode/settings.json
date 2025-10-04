@@ -5,6 +5,8 @@
         "string": "cpp",
         "unordered_map": "cpp",
         "iostream": "cpp",
+        "regex": "cpp"
+        "iostream": "cpp",
         "array": "cpp",
         "deque": "cpp",
         "map": "cpp",

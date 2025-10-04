@@ -245,6 +245,7 @@ int sgt(const vector<string> &terms)
 
 int sle(const vector<string> &terms)
 {
+    return 0;
     // return 1 - sgt(terms);
 }
 
@@ -351,7 +352,11 @@ int bne(const vector<string> &terms, int curr_line_num, const map<string, int> &
 
 int la(const vector<string> &terms, const map<string, int> &static_label_lines)
 {
-    return encode_Itype(8, 0, registers[terms[1]], static_label_lines.at(terms[2]));
+    if (static_label_lines.find(terms[2]) != static_label_lines.end()) {
+        return encode_Itype(8, 0, registers[terms[1]], static_label_lines.at(terms[2]));
+    }
+    // Below this should be error handling.
+    return 0;
 }
 
 int li(const vector<string> &terms)
