@@ -11,6 +11,15 @@
 #include <map>
 
 using namespace std;
+
+vector<string> instructions;
+vector<string> static_memory;
+
+int curr_line_num = 0;                     // Line number
+map<string, int> instruction_labels_lines; // Label and what line number they correspond to ()
+map<string, int> static_label_lines;
+int memory_address = 0;
+
 /**
  * Helper Functions for String Processing
  */
@@ -231,18 +240,17 @@ int sge(const vector<string> &terms)
 
 int sgt(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    return encode_Rtype(0, registers[terms[3]], registers[terms[2]], registers[terms[1]], 0, 42);
 }
 
 int sle(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    // return 1 - sgt(terms);
 }
 
 int seq(const vector<string> &terms)
 {
+    
     return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
