@@ -4,6 +4,10 @@
         "vector": "cpp",
         "string": "cpp",
         "unordered_map": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "map": "cpp",
+        "string_view": "cpp"
     }
 }
