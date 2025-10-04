@@ -232,88 +232,103 @@ int mov(const vector<string> &terms)
 }
 
 // TODO
-int sge(const vector<string> &terms)
+vector<int> sge(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    int instr1 = encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers["$at"], 0, 42); //slt
+    int instr2 = encode_Itype(14, registers["$at"], registers[terms[1]], 1); //xori
+    return {instr1, instr2};
 }
 
-int sgt(const vector<string> &terms)
+vector<int> sgt(const vector<string> &terms)
 {
-    return encode_Rtype(0, registers[terms[3]], registers[terms[2]], registers[terms[1]], 0, 42);
+    int instr1 = encode_Rtype(0, registers[terms[3]], registers[terms[2]], registers[terms[1]], 0, 42);
+    return {instr1};
 }
 
-int sle(const vector<string> &terms)
+vector<int> sle(const vector<string> &terms)
 {
-    return 0;
-    // return 1 - sgt(terms);
+    int instr1 = encode_Rtype(0, registers[terms[3]], registers[terms[2]], registers["$at"], 0, 42); //sgt
+    int instr2 = encode_Itype(14, registers["$at"], registers[terms[1]], 1); //xori
+    return {instr1, instr2};
 }
 
 int seq(const vector<string> &terms)
 {
-    
-    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int sne(const vector<string> &terms)
 {
-    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
-int bge(const vector<string> &terms)
+vector<int> bge(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    int instr1 = encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers["$at"], 0, 42); //slt
+    
+    //beq
+    int offset = instruction_labels_lines.at(terms[3]) - (curr_line_num + 1);
+    int instr2 = encode_Itype(4, registers["$at"], 0, offset);
+
+    return {instr1, instr2};
 }
 
-int bgt(const vector<string> &terms)
+vector<int> bgt(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    int instr1 = encode_Rtype(0, registers[terms[3]], registers[terms[2]], registers["$at"], 0, 42); //sgt
+
+    //bne
+    int offset = instruction_labels_lines.at(terms[3]) - (curr_line_num + 1);
+    int instr2 = encode_Itype(5, registers["$at"], 0, offset);
+
+    return {instr1, instr2};
 }
 
-int ble(const vector<string> &terms)
+vector<int> ble(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    int instr1 = encode_Rtype(0, registers[terms[3]], registers[terms[2]], registers["$at"], 0, 42); //sgt
+
+    //beq
+    int offset = instruction_labels_lines.at(terms[3]) - (curr_line_num + 1);
+    int instr2 = encode_Itype(4, registers["$at"], 0, offset);
+
+    return {instr1, instr2};
 }
 
-int blt(const vector<string> &terms)
+vector<int> blt(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    int instr1 = encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers["$at"], 0, 42); //slt
+
+    //bne
+    int offset = instruction_labels_lines.at(terms[3]) - (curr_line_num + 1);
+    int instr2 = encode_Itype(5, registers["$at"], 0, offset);
+
+    return {instr1, instr2};
 }
 
 int abs(const vector<string> &terms)
 {
-    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int mips_and(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 36);
 }
 
 int mips_or(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 37);
 }
 
-int mips_nor(const vector<string> &terms)
+int nor(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 39);
 }
 
 int mips_xor(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 38);
 }
 
 
@@ -352,11 +367,7 @@ int bne(const vector<string> &terms, int curr_line_num, const map<string, int> &
 
 int la(const vector<string> &terms, const map<string, int> &static_label_lines)
 {
-    if (static_label_lines.find(terms[2]) != static_label_lines.end()) {
-        return encode_Itype(8, 0, registers[terms[1]], static_label_lines.at(terms[2]));
-    }
-    // Below this should be error handling.
-    return 0;
+    return encode_Itype(8, 0, registers[terms[1]], static_label_lines.at(terms[2]));
 }
 
 int li(const vector<string> &terms)
@@ -367,30 +378,23 @@ int li(const vector<string> &terms)
 // TODO
 int andi(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    return encode_Itype(12, registers[terms[2]], registers[terms[1]], stoi(terms[3]));
 }
 
 int ori(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    return encode_Itype(13, registers[terms[2]], registers[terms[1]], stoi(terms[3]));
 }
 
 int xori(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    return encode_Itype(14, registers[terms[2]], registers[terms[1]], stoi(terms[3]));
 }
 
 int lui(const vector<string> &terms)
 {
-    return 0;
-    // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
+    return encode_Itype(15, 0, registers[terms[1]], stoi(terms[3]));
 }
-
-
-
 
 // J-Type Instructions
 int j(const vector<string> &terms, const map<string, int> &instruction_labels_lines)
