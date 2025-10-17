@@ -1,22 +1,7 @@
 #ifndef __PROJECT1_CPP__
 #define __PROJECT1_CPP__
-
-// Switch to "true" for debugging
-#define DEBUG false
-
+#define DEBUG true
 #include "project1.h"
-#include <vector>
-#include <string>
-#include <unordered_map>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <regex>
-
-// int ra; // Global return address (line number)
-
-// Regex for extracting quoted strings
-regex string_pattern("\"([^\"]*)\"");
 
 int main(int argc, char *argv[])
 {
@@ -31,8 +16,6 @@ int main(int argc, char *argv[])
     static_outfile.open(argv[argc - 2], ios::binary);
     inst_outfile.open(argv[argc - 1], ios::binary);
 
-    vector<string> instructions;
-    vector<string> static_memory;
     /**
      * Phase 1:
      * Read all instructions, clean them of comments and whitespace DONE
@@ -42,10 +25,13 @@ int main(int argc, char *argv[])
      * (measured in instructions) starting at 0
      */
 
-    int curr_line_num = 0;                     // Line number
-    map<string, int> instruction_labels_lines; // Label and what line number they correspond to ()
-    map<string, int> static_label_lines;
-    int memory_address = 0;
+    // vector<string> instructions;
+    // vector<string> static_memory;
+    
+    // int curr_line_num = 0;                     // Line number
+    // map<string, int> instruction_labels_lines; // Label and what line number they correspond to ()
+    // map<string, int> static_label_lines;
+    // int memory_address = 0;
 
     // For each input file:
     for (int i = 1; i < argc - 2; i++)
@@ -140,6 +126,7 @@ int main(int argc, char *argv[])
      * TODO: All of this
      */
     int result;
+    vector<int> results;
     for (string data : static_memory)
     {
         // check if the data is a reference to a label
@@ -153,9 +140,9 @@ int main(int argc, char *argv[])
         }
         else
         {
-            // Otherwise, it's a number (decimal or hex?)
-            result = stoi(data, nullptr, 0); // 0 --> auto-detect base
+            result = stoi(data);
         }
+
         write_binary(result, static_outfile);
     }
 
@@ -174,168 +161,227 @@ int main(int argc, char *argv[])
                                    ? instruction_map[inst_type]
                                    : UNKNOWN;
 
-        int result = 0;
-
         switch (type)
         {
         case ADD:
             result = add(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case ADDI:
             result = addi(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case SUB:
             result = sub(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case MULT:
             result = mult(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case DIV:
             result = div(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case MFLO:
             result = mflo(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case MFHI:
             result = mfhi(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case SLL:
             result = sll(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case SRL:
             result = srl(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case LW:
             result = lw(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case SW:
             result = sw(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case SLT:
             result = slt(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case BEQ:
             result = beq(terms, curr_line_num, instruction_labels_lines);
+            write_binary(result, inst_outfile);
             break;
 
         case BNE:
             result = bne(terms, curr_line_num, instruction_labels_lines);
+            write_binary(result, inst_outfile);
             break;
 
         case J:
             result = j(terms, instruction_labels_lines);
+            write_binary(result, inst_outfile);
             break;
 
         case JAL:
             result = jal(terms, instruction_labels_lines);
+            write_binary(result, inst_outfile);
             break;
 
         case JR:
             result = jr(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case JALR:
             result = jalr(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case SYSCALL:
             result = syscall(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case LA:
             result = la(terms, static_label_lines);
+            write_binary(result, inst_outfile);
             break;
 
         case MOV:
             result = mov(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case LI:
             result = li(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case SGE:
-            result = sge(terms);
+            results = sge(terms);
+            for (int r : results)
+            {
+                write_binary(r, inst_outfile);
+            }
             break;
 
         case SGT:
-            result = sgt(terms);
+            results = sgt(terms);
+            for (int r : results)
+            {
+                write_binary(r, inst_outfile);
+            }
             break;
 
         case SLE:
-            result = sle(terms);
+            results = sle(terms);
+            for (int r : results)
+            {
+                write_binary(r, inst_outfile);
+            }
             break;
 
-        case SEQ:
-            result = seq(terms);
-            break;
+            // case SEQ:
+            //     result = seq(terms);
+            //     write_binary(result, inst_outfile);
+            //     break;
 
-        case SNE:
-            result = sne(terms);
-            break;
+            // case SNE:
+            //     result = sne(terms);
+            //     write_binary(result, inst_outfile);
+            //     break;
 
         case BGE:
-            result = bge(terms);
+            results = bge(terms);
+            for (int r : results)
+            {
+                write_binary(r, inst_outfile);
+            }
             break;
 
         case BGT:
-            result = bgt(terms);
+            results = bgt(terms);
+            for (int r : results)
+            {
+                write_binary(r, inst_outfile);
+            }
             break;
 
         case BLE:
-            result = ble(terms);
+            results = ble(terms);
+            for (int r : results)
+            {
+                write_binary(r, inst_outfile);
+            }
             break;
 
         case BLT:
-            result = blt(terms);
+            results = blt(terms);
+            for (int r : results)
+            {
+                write_binary(r, inst_outfile);
+            }
             break;
 
-        case ABS:
-            result = abs(terms);
-            break;
+            // case ABS:
+            //     result = abs(terms);
+            //     write_binary(result, inst_outfile);
+            //     break;
 
         case AND:
             result = mips_and(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case OR:
             result = mips_or(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case NOR:
             result = mips_nor(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case XOR:
             result = mips_xor(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case ANDI:
             result = andi(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case ORI:
             result = ori(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case XORI:
             result = xori(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case LUI:
             result = lui(terms);
+            write_binary(result, inst_outfile);
             break;
 
         case UNKNOWN:
@@ -343,8 +389,6 @@ int main(int argc, char *argv[])
             cerr << "Warning: Unknown instruction \"" << inst_type << "\" at line " << curr_line_num << "(0-based line counting)" << endl;
             break;
         }
-
-        write_binary(result, inst_outfile);
 
         curr_line_num++;
     }
@@ -359,7 +403,7 @@ int main(int argc, char *argv[])
             cout << i << ": " << instructions[i] << endl;
         }
 
-        cout << "\n\tLABELS\n"
+        cout << "\n\tINSTRUCTION LABELS\n"
              << endl;
         // Print map of labels and line nums
         for (auto l : instruction_labels_lines)

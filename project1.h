@@ -9,6 +9,7 @@
 #include <sstream>
 #include <fstream>
 #include <map>
+#include <regex>
 
 using namespace std;
 
@@ -19,6 +20,9 @@ int curr_line_num = 0;                     // Line number
 map<string, int> instruction_labels_lines; // Label and what line number they correspond to ()
 map<string, int> static_label_lines;
 int memory_address = 0;
+
+// Regex for extracting quoted strings
+regex string_pattern("\"([^\"]*)\"");
 
 /**
  * Helper Functions for String Processing
@@ -156,7 +160,7 @@ enum InstructionType
 
 // Map each instruction to each enum
 static unordered_map<string, InstructionType> instruction_map{
-    {"add", ADD}, {"addi", ADDI}, {"sub", SUB}, {"mult", MULT}, {"div", DIV}, {"mflo", MFLO}, {"mfhi", MFHI}, {"sll", SLL}, {"srl", SRL}, {"lw", LW}, {"sw", SW}, {"slt", SLT}, {"beq", BEQ}, {"bne", BNE}, {"j", J}, {"jal", JAL}, {"jr", JR}, {"jalr", JALR}, {"syscall", SYSCALL}, {"la", LA}, {"mov", MOV}, {"li", LI}, {"sge", SGE}, {"sgt", SGT}, {"sle", SLE}, {"seq", SEQ}, {"sne", SNE}, {"bge", BGE}, {"bgt", BGT}, {"ble", BLE}, {"blt", BLT}, {"abs", ABS}};
+    {"add", ADD}, {"addi", ADDI}, {"sub", SUB}, {"mult", MULT}, {"div", DIV}, {"mflo", MFLO}, {"mfhi", MFHI}, {"sll", SLL}, {"srl", SRL}, {"lw", LW}, {"sw", SW}, {"slt", SLT}, {"beq", BEQ}, {"bne", BNE}, {"j", J}, {"jal", JAL}, {"jr", JR}, {"jalr", JALR}, {"syscall", SYSCALL}, {"la", LA}, {"mov", MOV}, {"li", LI}, {"sge", SGE}, {"sgt", SGT}, {"sle", SLE}, {"seq", SEQ}, {"sne", SNE}, {"bge", BGE}, {"bgt", BGT}, {"ble", BLE}, {"blt", BLT}, {"abs", ABS}, {"and", AND}, {"or", OR}, {"nor", NOR}, {"xor", XOR}, {"andi", ANDI}, {"ori", ORI}, {"xori", XORI}, {"lui", LUI}};
 
 // R-Type Instructions
 int add(const vector<string> &terms)
@@ -236,12 +240,14 @@ vector<int> sge(const vector<string> &terms)
 {
     int instr1 = encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers["$at"], 0, 42); //slt
     int instr2 = encode_Itype(14, registers["$at"], registers[terms[1]], 1); //xori
+    curr_line_num++;
     return {instr1, instr2};
 }
 
 vector<int> sgt(const vector<string> &terms)
 {
     int instr1 = encode_Rtype(0, registers[terms[3]], registers[terms[2]], registers[terms[1]], 0, 42);
+    curr_line_num++;
     return {instr1};
 }
 
@@ -249,16 +255,19 @@ vector<int> sle(const vector<string> &terms)
 {
     int instr1 = encode_Rtype(0, registers[terms[3]], registers[terms[2]], registers["$at"], 0, 42); //sgt
     int instr2 = encode_Itype(14, registers["$at"], registers[terms[1]], 1); //xori
+    curr_line_num++;
     return {instr1, instr2};
 }
 
 int seq(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
 int sne(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
@@ -270,6 +279,7 @@ vector<int> bge(const vector<string> &terms)
     int offset = instruction_labels_lines.at(terms[3]) - (curr_line_num + 1);
     int instr2 = encode_Itype(4, registers["$at"], 0, offset);
 
+    curr_line_num++;
     return {instr1, instr2};
 }
 
@@ -281,6 +291,7 @@ vector<int> bgt(const vector<string> &terms)
     int offset = instruction_labels_lines.at(terms[3]) - (curr_line_num + 1);
     int instr2 = encode_Itype(5, registers["$at"], 0, offset);
 
+    curr_line_num++;
     return {instr1, instr2};
 }
 
@@ -292,6 +303,7 @@ vector<int> ble(const vector<string> &terms)
     int offset = instruction_labels_lines.at(terms[3]) - (curr_line_num + 1);
     int instr2 = encode_Itype(4, registers["$at"], 0, offset);
 
+    curr_line_num++;
     return {instr1, instr2};
 }
 
@@ -303,11 +315,13 @@ vector<int> blt(const vector<string> &terms)
     int offset = instruction_labels_lines.at(terms[3]) - (curr_line_num + 1);
     int instr2 = encode_Itype(5, registers["$at"], 0, offset);
 
+    curr_line_num++;
     return {instr1, instr2};
 }
 
 int abs(const vector<string> &terms)
 {
+    return 0;
     // return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 42);
 }
 
@@ -321,7 +335,7 @@ int mips_or(const vector<string> &terms)
     return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 37);
 }
 
-int nor(const vector<string> &terms)
+int mips_nor(const vector<string> &terms)
 {
     return encode_Rtype(0, registers[terms[2]], registers[terms[3]], registers[terms[1]], 0, 39);
 }
@@ -393,7 +407,7 @@ int xori(const vector<string> &terms)
 
 int lui(const vector<string> &terms)
 {
-    return encode_Itype(15, 0, registers[terms[1]], stoi(terms[3]));
+    return encode_Itype(15, 0, registers[terms[1]], stoi(terms[2]));
 }
 
 // J-Type Instructions
