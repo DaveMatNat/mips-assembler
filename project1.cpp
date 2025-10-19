@@ -1,6 +1,6 @@
 #ifndef __PROJECT1_CPP__
 #define __PROJECT1_CPP__
-#define DEBUG true
+#define DEBUG false
 #include "project1.h"
 
 int main(int argc, char *argv[])
@@ -43,7 +43,10 @@ int main(int argc, char *argv[])
             exit(1);
         }
 
-        string str;
+    string str;
+    // Instructions that expand to multiple machine instructions (one extra word)
+    // Add new pseudo-instructions here when needed.
+    vector<string> expanding_insts = {"sge", "sgt", "sle", "bge", "bgt", "ble", "blt"};
         while (getline(infile, str))
         {                     // Read a line from the file
             str = clean(str); // remove comments, leading and trailing whitespace
@@ -61,6 +64,7 @@ int main(int argc, char *argv[])
                     // If full match and capture group exist.
                     if (match.size() > 1)
                     {
+                        // cout << "fullmatch --> " << match[0] << endl;
                         string ascii_string = match[1].str(); // match[0] for capture group
                         vector<string> no_space = split(str, WHITESPACE);
 
@@ -114,6 +118,23 @@ int main(int argc, char *argv[])
             else
             {
                 instructions.push_back(str); // TODO This will need to change for labels
+
+                // If the instruction is one that expands into multiple
+                // machine instructions (e.g., pseudo-instructions), account
+                // for the additional output line here by incrementing
+                // curr_line_num an extra time so label numbering stays correct.
+                vector<string> no_space = split(str, WHITESPACE + ",()");
+                if (no_space.size() > 0) {
+                    string inst = no_space[0];
+                    for (string &p : expanding_insts) {
+                        if (inst == p) {
+                            // This pseudo-instruction will produce one extra
+                            // machine instruction; reserve that slot now.
+                            curr_line_num++;
+                            break;
+                        }
+                    }
+                }
             }
 
             curr_line_num++;
@@ -395,8 +416,8 @@ int main(int argc, char *argv[])
 
     if (DEBUG)
     {
-        // Print map of labels and line nums
-        cout << "\n\tLine Nums and Instruction labels MAP\n"
+        // Print all instructions
+        cout << "\n\tInstructions\n"
              << endl;
         for (int i = 0; i < instructions.size(); i++)
         {
