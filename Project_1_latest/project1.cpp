@@ -1,6 +1,6 @@
 #ifndef __PROJECT1_CPP__
 #define __PROJECT1_CPP__
-#define DEBUG true
+#define DEBUG false
 #include "project1.h"
 
 int main(int argc, char *argv[])
@@ -154,7 +154,6 @@ int main(int argc, char *argv[])
         if (instruction_labels_lines.find(data) != instruction_labels_lines.end())
         {
             result = instruction_labels_lines[data] * 4; // Check document page 5 on why 7 * 4 = 28 for "f"
-
         }
         else if (static_label_lines.find(data) != static_label_lines.end())
         {
@@ -164,7 +163,6 @@ int main(int argc, char *argv[])
         {
             result = stoi(data);
         }
-        // cout << result << endl;
 
         write_binary(result, static_outfile);
     }

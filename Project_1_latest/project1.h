@@ -381,37 +381,7 @@ int bne(const vector<string> &terms, int curr_line_num, const map<string, int> &
 
 int la(const vector<string> &terms, const map<string, int> &static_label_lines)
 {
-    string label = terms[2];
-    int address;
-    
-    // Check if it's an instruction label
-    if (instruction_labels_lines.find(label) != instruction_labels_lines.end())
-    {
-        address = instruction_labels_lines[label] * 4;
-    }
-    // Check if it's a static data label
-    else if (static_label_lines.find(label) != static_label_lines.end())
-    {
-        int static_index = static_label_lines.at(label) / 4;
-        
-        // If the static memory contains an instruction label, load that address
-        if (static_index < static_memory.size() && 
-            instruction_labels_lines.find(static_memory[static_index]) != instruction_labels_lines.end())
-        {
-            address = instruction_labels_lines[static_memory[static_index]] * 4;
-        }
-        else
-        {
-            address = static_label_lines.at(label);
-        }
-    }
-    else
-    {
-        cerr << "Error: unknown label '" << label << "' in la instruction" << endl;
-        exit(1);
-    }
-    
-    return encode_Itype(8, 0, registers[terms[1]], address);
+    return encode_Itype(8, 0, registers[terms[1]], static_label_lines.at(terms[2]));
 }
 
 int li(const vector<string> &terms)
